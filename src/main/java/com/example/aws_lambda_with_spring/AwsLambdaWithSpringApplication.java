@@ -25,7 +25,7 @@ public class AwsLambdaWithSpringApplication {
 						.GET("/ping", request -> ServerResponse.ok().body(
 									Map.of(
 											"message", "pong",
-											"headers", request.headers().asHttpHeaders()
+											"headers", request.headers().asHttpHeaders().toSingleValueMap()
 									)
 								)
 						)
