@@ -108,3 +108,67 @@ The new route `ANY /orders/{proxy+}` will be created on the next `terraform appl
 ```hcl
 "ANY /product" => { ... }
 ```
+
+## Path Rewriting (External Path ≠ Lambda Internal Path)
+
+If a Lambda's internal routes use a different base path than what API Gateway exposes, use **parameter mapping** on the integration to rewrite the path before it reaches the Lambda.
+
+**Example:** API Gateway exposes `ANY /min/{proxy+}` but the Lambda handles requests at `/api/min/*`.
+
+Add `request_parameters` to the `aws_apigatewayv2_integration` resource in `modules/api-gateway/main.tf`:
+
+```hcl
+resource "aws_apigatewayv2_integration" "this" {
+  # ... existing config ...
+  request_parameters = {
+    "overwrite:path" = "/api$request.path"
+  }
+}
+```
+
+`$request.path` resolves to the full incoming path (e.g. `/min/items/123`), so `/api$request.path` rewrites it to `/api/min/items/123`.
+
+### Making it configurable per-integration
+
+Extend the `integrations` variable in `modules/api-gateway/variables.tf` with an optional field:
+
+```hcl
+variable "integrations" {
+  type = map(object({
+    lambda_function_arn  = string
+    lambda_function_name = string
+    path_prefix_rewrite  = optional(string)  # e.g. "/api"
+  }))
+}
+```
+
+Update the integration resource to apply it conditionally:
+
+```hcl
+resource "aws_apigatewayv2_integration" "this" {
+  for_each = var.integrations
+  # ...
+  request_parameters = each.value.path_prefix_rewrite != null ? {
+    "overwrite:path" = "${each.value.path_prefix_rewrite}$request.path"
+  } : {}
+}
+```
+
+Pass `path_prefix_rewrite` only for lambdas that need it in `terraform/main.tf`:
+
+```hcl
+module "api_gateway" {
+  source = "./modules/api-gateway"
+  name   = "aws-lambda-api"
+
+  integrations = {
+    "ANY /min/{proxy+}" = {
+      lambda_function_arn  = module.lambda["aws-lambda-with-spring-min"].function_arn
+      lambda_function_name = module.lambda["aws-lambda-with-spring-min"].function_name
+      path_prefix_rewrite  = "/api"   # rewrites /min/... → /api/min/...
+    }
+  }
+}
+```
+
+Lambdas that omit `path_prefix_rewrite` (or set it to `null`) pass the path through unchanged.
