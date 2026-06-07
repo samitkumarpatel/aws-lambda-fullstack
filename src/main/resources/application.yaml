@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: aws-lambda-with-spring
+    api:
+      base-uri: ${API_BASE_URI:/api}
+  main:
+    lazy-initialization: true
+
+
