@@ -21,13 +21,13 @@ public class AwsLambdaWithSpringApplication {
 	RouterFunction<ServerResponse> routerFunction(@Value("${spring.application.api.base-uri}") String baseUri) {
 		return RouterFunctions
 				.route()
-				.path(baseUri, uriBuilder -> uriBuilder
+				.path(baseUri, builder -> builder
 						.GET("/ping", request -> ServerResponse.ok().body(
-									Map.of(
-											"message", "pong",
-											"headers", request.headers().asHttpHeaders().toSingleValueMap()
-									)
+								Map.of(
+										"message", "pong",
+										"headers", request.headers().asHttpHeaders().toSingleValueMap()
 								)
+							)
 						)
 				)
 				.build();

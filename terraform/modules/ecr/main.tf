@@ -11,6 +11,7 @@ resource "aws_ecr_repository" "this" {
 resource "null_resource" "this" {
   triggers = {
     ecr_repo_url = aws_ecr_repository.this.repository_url
+    source_image = var.source_image
   }
 
   provisioner "local-exec" {
@@ -18,9 +19,9 @@ resource "null_resource" "this" {
       aws ecr get-login-password --region ${var.aws_region} \
         | docker login --username AWS --password-stdin ${aws_ecr_repository.this.registry_id}.dkr.ecr.${var.aws_region}.amazonaws.com
 
-      docker pull public.ecr.aws/lambda/java:25
-      docker tag  public.ecr.aws/lambda/java:25 ${aws_ecr_repository.this.repository_url}:latest
-      docker push ${aws_ecr_repository.this.repository_url}:latest
+      docker pull ${var.source_image}
+      docker tag  ${var.source_image} ${aws_ecr_repository.this.repository_url}:${var.source_image_tag}
+      docker push ${aws_ecr_repository.this.repository_url}:${var.source_image_tag}
     EOT
   }
 }

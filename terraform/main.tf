@@ -1,14 +1,21 @@
 locals {
-  ecr = ["aws-lambda-with-spring"]
-  s3  = []
+  ecr = {
+    "aws-lambda-with-spring" = {
+      source_image     = "ghcr.io/samitkumarpatel/aws-lambda-with-spring:sha-1ea3501"
+      source_image_tag = "latest"
+    }
+  }
+  s3 = []
   functions = {
     "aws-lambda-with-spring" = {
       api_type    = "http"
+      api_gateway_path_prefix = "api"
       memory_size = 3008
       environment_variables = {}
     },
     "aws-lambda-with-spring-product" = {
       api_type    = "http"
+      api_gateway_path_prefix = "product"
       memory_size = 3008
       environment_variables = {
         API_BASE_URI = "/product"
@@ -16,17 +23,19 @@ locals {
     }
   }
 
-  ecr_repos      = toset(local.ecr)
+  ecr_repos      = local.ecr
   s3_buckets     = toset(local.s3)
   http_functions = { for k, v in local.functions : k => v if v.api_type == "http" }
   url_functions  = { for k, v in local.functions : k => v if v.api_type == "function_url" }
 }
 
 module "ecr" {
-  source     = "./modules/ecr"
-  for_each   = local.ecr_repos
-  name       = each.key
-  aws_region = "eu-north-1"
+  source           = "./modules/ecr"
+  for_each         = local.ecr_repos
+  name             = each.key
+  aws_region       = "eu-north-1"
+  source_image     = each.value.source_image
+  source_image_tag = each.value.source_image_tag
 }
 
 module "s3" {
@@ -39,9 +48,9 @@ module "lambda" {
   source   = "./modules/lambda"
   for_each = local.functions
 
-  name                  = each.key
-  image_uri             = "${module.ecr["aws-lambda-with-spring"].repository_url}:latest"
-  memory_size           = each.value.memory_size
+  name      = each.key
+  image_uri = "${module.ecr["aws-lambda-with-spring"].repository_url}:latest"
+  memory_size = each.value.memory_size
   environment_variables = each.value.environment_variables
 
   depends_on = [module.ecr]
@@ -60,8 +69,8 @@ module "api_gateway" {
   name   = "aws-lambda-api"
 
   integrations = {
-    for k in keys(local.http_functions) :
-    (length(local.http_functions) == 1 ? "$default" : "ANY /${k}/{proxy+}") => {
+    for k, v in local.http_functions :
+    "ANY /${v.api_gateway_path_prefix}/{proxy+}" => {
       lambda_function_arn  = module.lambda[k].function_arn
       lambda_function_name = module.lambda[k].function_name
     }

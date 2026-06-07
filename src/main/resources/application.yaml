@@ -5,5 +5,3 @@ spring:
       base-uri: ${API_BASE_URI:/api}
   main:
     lazy-initialization: true
-
-

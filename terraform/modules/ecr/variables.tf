@@ -15,3 +15,15 @@ variable "keep_image_count" {
 variable "aws_region" {
   type = string
 }
+
+variable "source_image" {
+  type        = string
+  description = "Full image reference to pull and proxy into ECR (e.g. ghcr.io/org/repo:tag)"
+  default     = "public.ecr.aws/lambda/java:25"
+}
+
+variable "source_image_tag" {
+  type        = string
+  description = "Tag to use when pushing the proxied image to ECR"
+  default     = "latest"
+}
