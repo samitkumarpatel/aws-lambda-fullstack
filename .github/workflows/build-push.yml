@@ -22,7 +22,7 @@ jobs:
           cache: maven
 
       - name: Build
-        run: ./mvnw clean install
+        run: ./mvnw -B clean install
 
       - name: Log in to GitHub Container Registry
         if: github.event_name != 'pull_request'

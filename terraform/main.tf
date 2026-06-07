@@ -1,24 +1,32 @@
 locals {
   ecr = {
     "aws-lambda-with-spring" = {
-      source_image     = "ghcr.io/samitkumarpatel/aws-lambda-with-spring:sha-1ea3501"
+      source_image     = "ghcr.io/samitkumarpatel/aws-lambda-with-spring:sha-56df807"
       source_image_tag = "latest"
     }
   }
   s3 = []
   functions = {
     "aws-lambda-with-spring" = {
-      api_type    = "http"
+      api_type                = "http"
       api_gateway_path_prefix = "api"
-      memory_size = 3008
-      environment_variables = {}
+      memory_size             = 3008
+      environment_variables   = {}
     },
     "aws-lambda-with-spring-product" = {
-      api_type    = "http"
+      api_type                = "http"
       api_gateway_path_prefix = "product"
-      memory_size = 3008
+      memory_size             = 3008
       environment_variables = {
         API_BASE_URI = "/product"
+      }
+    },
+    "aws-lambda-with-spring-planning" = {
+      api_type                = "http"
+      api_gateway_path_prefix = "planning"
+      memory_size             = 3008
+      environment_variables = {
+        API_BASE_URI = "/planning"
       }
     }
   }
@@ -48,9 +56,9 @@ module "lambda" {
   source   = "./modules/lambda"
   for_each = local.functions
 
-  name      = each.key
-  image_uri = "${module.ecr["aws-lambda-with-spring"].repository_url}:latest"
-  memory_size = each.value.memory_size
+  name                  = each.key
+  image_uri             = "${module.ecr["aws-lambda-with-spring"].repository_url}:latest"
+  memory_size           = each.value.memory_size
   environment_variables = each.value.environment_variables
 
   depends_on = [module.ecr]
