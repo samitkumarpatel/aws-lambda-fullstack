@@ -26,6 +26,10 @@ resource "aws_apigatewayv2_integration" "this" {
   integration_type       = "AWS_PROXY"
   integration_uri        = each.value.lambda_function_arn
   payload_format_version = "2.0"
+
+  request_parameters = length(each.value.path_rewrites) > 0 ? {
+    "overwrite:path" = "${values(each.value.path_rewrites)[0]}/$request.path.proxy"
+  } : {}
 }
 
 resource "aws_apigatewayv2_route" "this" {

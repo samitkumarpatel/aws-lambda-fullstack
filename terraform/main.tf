@@ -1,7 +1,7 @@
 locals {
   ecr = {
     "aws-lambda-with-spring" = {
-      source_image     = "ghcr.io/samitkumarpatel/aws-lambda-with-spring:sha-56df807"
+      source_image     = "ghcr.io/samitkumarpatel/aws-lambda-with-spring:latest"
       source_image_tag = "latest"
     }
   }
@@ -10,12 +10,16 @@ locals {
     "aws-lambda-with-spring" = {
       api_type                = "http"
       api_gateway_path_prefix = "api"
+      path_rewrites           = {}
       memory_size             = 3008
       environment_variables   = {}
     },
     "aws-lambda-with-spring-product" = {
       api_type                = "http"
       api_gateway_path_prefix = "product"
+      path_rewrites = {
+          "product" = "/product"
+      }
       memory_size             = 3008
       environment_variables = {
         API_BASE_URI = "/product"
@@ -23,7 +27,10 @@ locals {
     },
     "aws-lambda-with-spring-planning" = {
       api_type                = "http"
-      api_gateway_path_prefix = "planning"
+      api_gateway_path_prefix = "nothing"
+      path_rewrites = {
+          "nothing" = "/planning"
+      }
       memory_size             = 3008
       environment_variables = {
         API_BASE_URI = "/planning"
@@ -81,6 +88,7 @@ module "api_gateway" {
     "ANY /${v.api_gateway_path_prefix}/{proxy+}" => {
       lambda_function_arn  = module.lambda[k].function_arn
       lambda_function_name = module.lambda[k].function_name
+      path_rewrites        = v.path_rewrites
     }
   }
 }

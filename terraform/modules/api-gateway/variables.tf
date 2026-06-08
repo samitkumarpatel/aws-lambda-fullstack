@@ -11,6 +11,7 @@ variable "integrations" {
   type = map(object({
     lambda_function_arn  = string
     lambda_function_name = string
+    path_rewrites        = optional(map(string), {})
   }))
   description = <<-EOT
     Map of route_key => Lambda target.
