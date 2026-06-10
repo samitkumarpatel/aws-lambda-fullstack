@@ -6,9 +6,9 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.43"
     }
-    null = {
-      source  = "hashicorp/null"
-      version = "~> 3.0"
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.0"
     }
   }
 
@@ -22,4 +22,9 @@ terraform {
 
 provider "aws" {
   region = "eu-north-1"
+}
+
+provider "azurerm" {
+  features {}
+  # Auth via env vars: ARM_TENANT_ID, ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_SUBSCRIPTION_ID
 }

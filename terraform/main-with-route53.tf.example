@@ -1,3 +1,19 @@
+# Alternative to main.tf — uses Route53 for api.your-task.dev instead of Azure DNS directly.
+#
+# HOW TO USE:
+#   1. Delete (or rename) main.tf
+#   2. Rename this file to main.tf
+#   3. Run: terraform init && terraform apply
+#   4. After apply, copy the 4 NS values from output "route53_name_servers"
+#   5. Add a NS record in Azure DNS:
+#        Zone: your-task.dev  |  Name: api  |  Type: NS  |  Values: <the 4 NS values>
+#
+# WHY THIS APPROACH:
+#   - No azurerm provider needed — everything stays in AWS
+#   - ACM validation is handled natively via aws_route53_record
+#   - API Gateway gets a proper ALIAS record (not a CNAME) for better DNS behaviour
+#   - Azure DNS only needs one manual NS delegation record, set once and never touched again
+
 locals {
 
   ecr = {
@@ -13,7 +29,7 @@ locals {
     "aws-lambda-with-spring" = {
       memory_size           = 3008
       environment_variables = {}
-      enable_function_url   = false #default is false
+      enable_function_url   = false
       api_gateway_route = {
         path_prefix   = "api"
         path_rewrites = {}
@@ -92,40 +108,35 @@ module "acm" {
   domain_name = local.domain.name
 }
 
-variable "azure_resource_group" {
-  type        = string
-  description = "Azure resource group containing the DNS zone"
-  default = "DefaultResourceGroup-WEU"
+# Step 2: create a Route53 hosted zone for the subdomain api.your-task.dev
+resource "aws_route53_zone" "api" {
+  count = local.domain.name != "" ? 1 : 0
+  name  = local.domain.name
 }
 
-variable "azure_dns_zone" {
-  type        = string
-  description = "Azure DNS zone name (e.g. your-task.dev)"
-  default = "your-task.dev"
-}
-
-# Step 2: write the validation CNAME records into Azure DNS
-resource "azurerm_dns_cname_record" "acm_validation" {
+# Step 3: write the ACM validation CNAME records into Route53
+resource "aws_route53_record" "acm_validation" {
   for_each = local.domain.name != "" ? {
     for dvo in module.acm[0].validation_options : dvo.domain_name => dvo
   } : {}
 
-  name                = trimsuffix(trimsuffix(each.value.resource_record_name, "."), ".${var.azure_dns_zone}")
-  zone_name           = var.azure_dns_zone
-  resource_group_name = var.azure_resource_group
-  ttl                 = 300
-  record              = trimsuffix(each.value.resource_record_value, ".")
+  zone_id = aws_route53_zone.api[0].zone_id
+  name    = each.value.resource_record_name
+  type    = each.value.resource_record_type
+  ttl     = 300
+  records = [each.value.resource_record_value]
 }
 
-# Step 3: wait for ACM to confirm the certificate is validated. Read more - https://docs.aws.amazon.com/acm/latest/userguide/domain-ownership-validation.html
+# Step 4: wait for ACM to confirm the certificate is validated
 resource "aws_acm_certificate_validation" "this" {
   count                   = local.domain.name != "" ? 1 : 0
   certificate_arn         = module.acm[0].certificate_arn
   validation_record_fqdns = [for dvo in module.acm[0].validation_options : dvo.resource_record_name]
 
-  depends_on = [azurerm_dns_cname_record.acm_validation]
+  depends_on = [aws_route53_record.acm_validation]
 }
 
+# Step 5: create API Gateway with the validated certificate
 module "api_gateway_route" {
   source = "./modules/api-gateway"
   count  = length(local.http_api_gateway_routes) > 0 ? 1 : 0
@@ -144,12 +155,16 @@ module "api_gateway_route" {
   }
 }
 
-# Step 5: point api.your-task.dev → API Gateway custom domain in Azure DNS
-resource "azurerm_dns_cname_record" "api" {
-  count               = local.domain.name != "" ? 1 : 0
-  name                = split(".", local.domain.name)[0]
-  zone_name           = var.azure_dns_zone
-  resource_group_name = var.azure_resource_group
-  ttl                 = 300
-  record              = module.api_gateway_route[0].custom_domain_target
+# Step 6: point api.your-task.dev → API Gateway custom domain via Route53 ALIAS record
+resource "aws_route53_record" "api" {
+  count   = local.domain.name != "" ? 1 : 0
+  zone_id = aws_route53_zone.api[0].zone_id
+  name    = local.domain.name
+  type    = "A"
+
+  alias {
+    name                   = module.api_gateway_route[0].custom_domain_target
+    zone_id                = module.api_gateway_route[0].custom_domain_hosted_zone_id
+    evaluate_target_health = true
+  }
 }
