@@ -11,9 +11,9 @@ output "lambda_function_names" {
 }
 
 output "function_urls" {
-  value = { for k, v in module.function_url : k => v.function_url }
+  value = { for k, v in module.lambda : k => v.function_url if v.function_url != null }
 }
 
 output "api_gateway_endpoint" {
-  value = length(module.api_gateway) > 0 ? module.api_gateway[0].api_endpoint : null
+  value = length(module.api_gateway_route) > 0 ? module.api_gateway_route[0].api_endpoint : null
 }

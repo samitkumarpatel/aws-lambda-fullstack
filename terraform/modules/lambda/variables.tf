@@ -30,3 +30,30 @@ variable "log_retention_days" {
   type    = number
   default = 5
 }
+
+variable "enable_function_url" {
+  type    = bool
+  default = false
+}
+
+variable "function_url_authorization_type" {
+  type    = string
+  default = "NONE"
+}
+
+variable "function_url_cors" {
+  type = object({
+    allow_credentials = bool
+    allow_origins     = list(string)
+    allow_methods     = list(string)
+    allow_headers     = list(string)
+    max_age           = number
+  })
+  default = {
+    allow_credentials = false
+    allow_origins     = ["*"]
+    allow_methods     = ["*"]
+    allow_headers     = ["*"]
+    max_age           = 86400
+  }
+}

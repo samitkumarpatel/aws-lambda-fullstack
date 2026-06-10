@@ -25,6 +25,16 @@ variable "integrations" {
   EOT
 }
 
+variable "domain_name" {
+  type    = string
+  default = null
+}
+
+variable "certificate_arn" {
+  type    = string
+  default = null
+}
+
 variable "cors" {
   type = object({
     allow_origins     = list(string)

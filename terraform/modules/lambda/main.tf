@@ -46,3 +46,18 @@ resource "aws_cloudwatch_log_group" "this" {
   name              = "/aws/lambda/${var.name}"
   retention_in_days = var.log_retention_days
 }
+
+resource "aws_lambda_function_url" "this" {
+  count = var.enable_function_url ? 1 : 0
+
+  function_name      = aws_lambda_function.this.function_name
+  authorization_type = var.function_url_authorization_type
+
+  cors {
+    allow_credentials = var.function_url_cors.allow_credentials
+    allow_origins     = var.function_url_cors.allow_origins
+    allow_methods     = var.function_url_cors.allow_methods
+    allow_headers     = var.function_url_cors.allow_headers
+    max_age           = var.function_url_cors.max_age
+  }
+}

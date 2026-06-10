@@ -65,6 +65,26 @@ resource "aws_cloudwatch_log_group" "this" {
   retention_in_days = 5
 }
 
+resource "aws_apigatewayv2_domain_name" "this" {
+  count = var.domain_name != null ? 1 : 0
+
+  domain_name = var.domain_name
+
+  domain_name_configuration {
+    certificate_arn = var.certificate_arn
+    endpoint_type   = "REGIONAL"
+    security_policy = "TLS_1_2"
+  }
+}
+
+resource "aws_apigatewayv2_api_mapping" "this" {
+  count = var.domain_name != null ? 1 : 0
+
+  api_id      = aws_apigatewayv2_api.this.id
+  domain_name = aws_apigatewayv2_domain_name.this[0].id
+  stage       = aws_apigatewayv2_stage.this.id
+}
+
 resource "aws_lambda_permission" "this" {
   for_each = local.unique_lambdas
 
