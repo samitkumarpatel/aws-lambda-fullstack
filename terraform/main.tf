@@ -48,7 +48,7 @@ locals {
   }
 
   domain = {
-    name = ""  # e.g. api.example.com
+    name = "api.your-task.dev"  # e.g. api.example.com
   }
 
   ecr_repos  = local.ecr
