@@ -1,0 +1,332 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #0d1117;
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+/* ── Header ─────────────────────────────────────── */
+.app-header {
+  margin-bottom: 2rem;
+}
+.app-header h1 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  letter-spacing: 0.03em;
+}
+.app-header p {
+  font-size: 0.78rem;
+  color: #4b5563;
+  margin-top: 0.2rem;
+}
+
+/* ── URL Form ────────────────────────────────────── */
+.url-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+.url-input {
+  flex: 1;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  font-family: "SF Mono", "Fira Code", monospace;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.url-input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+.url-input::placeholder { color: #3d444d; }
+.send-btn {
+  background: #7c3aed;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.65rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+.send-btn:hover:not(:disabled) { background: #6d28d9; transform: translateY(-1px); }
+.send-btn:active:not(:disabled) { transform: translateY(0); }
+.send-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Loading ─────────────────────────────────────── */
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #4b5563;
+  font-size: 0.8rem;
+  padding: 0.5rem 0;
+}
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid #21262d;
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Error ───────────────────────────────────────── */
+.error-box {
+  background: #1c0a0a;
+  border: 1px solid #6b1919;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  color: #f87171;
+  font-size: 0.82rem;
+  font-family: monospace;
+}
+
+/* ── Status bar ──────────────────────────────────── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-family: monospace;
+  letter-spacing: 0.03em;
+}
+.badge-ok  { background: #0d2e18; color: #4ade80; border: 1px solid #166534; }
+.badge-err { background: #2d0a0a; color: #f87171; border: 1px solid #7f1d1d; }
+.badge-method { background: #1a1033; color: #a78bfa; border: 1px solid #4c1d95; }
+.status-url {
+  font-size: 0.78rem;
+  color: #4b5563;
+  font-family: monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Cards ───────────────────────────────────────── */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.card {
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.card:hover { border-color: #30363d; }
+
+.card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #21262d;
+  background: #0d1117;
+}
+.card-key {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7c3aed;
+}
+.card-count {
+  font-size: 0.68rem;
+  background: #21262d;
+  color: #8b949e;
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+  font-family: monospace;
+}
+.card-body {
+  padding: 0.9rem 1rem;
+}
+
+/* ── Message card ────────────────────────────────── */
+.card-message {
+  border-color: #1a3a1a;
+  background: linear-gradient(135deg, #0d2118 0%, #161b22 60%);
+}
+.card-message .card-top {
+  background: transparent;
+  border-bottom-color: #1a3a1a;
+}
+.card-message .card-key { color: #4ade80; }
+.message-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #4ade80;
+  font-family: "SF Mono", "Fira Code", monospace;
+  letter-spacing: 0.02em;
+}
+
+/* ── Primitive value card ────────────────────────── */
+.primitive-value {
+  font-size: 0.9rem;
+  font-family: "SF Mono", "Fira Code", monospace;
+}
+.pv-str  { color: #4ade80; }
+.pv-num  { color: #60a5fa; }
+.pv-bool { color: #fb923c; }
+.pv-null { color: #4b5563; font-style: italic; }
+
+/* ── Header search ───────────────────────────────── */
+.header-search {
+  margin-left: auto;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
+  color: #e2e8f0;
+  font-size: 0.75rem;
+  outline: none;
+  width: 140px;
+  transition: border-color 0.15s, width 0.2s;
+}
+.header-search:focus { border-color: #7c3aed; width: 200px; }
+.header-search::placeholder { color: #3d444d; }
+
+/* ── Header pills ────────────────────────────────── */
+.headers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.header-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  transition: background 0.1s;
+}
+.header-row:hover { background: #21262d; }
+
+.header-pill {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 600;
+  font-family: "SF Mono", "Fira Code", monospace;
+  padding: 0.15rem 0.55rem;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+  min-width: 80px;
+  text-align: center;
+}
+/* color by prefix */
+.pill-sec     { background: #1c1205; color: #fb923c; border: 1px solid #431407; }
+.pill-x       { background: #0c1a2e; color: #60a5fa; border: 1px solid #1d3a5e; }
+.pill-accept  { background: #0d1f1f; color: #2dd4bf; border: 1px solid #134e4a; }
+.pill-content { background: #0d1f10; color: #4ade80; border: 1px solid #14532d; }
+.pill-cache   { background: #1a1033; color: #a78bfa; border: 1px solid #4c1d95; }
+.pill-default { background: #1a1f2e; color: #94a3b8; border: 1px solid #2d3148; }
+
+.header-val {
+  font-size: 0.78rem;
+  font-family: "SF Mono", "Fira Code", monospace;
+  color: #8b949e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+.header-row:hover .header-val { color: #c9d1d9; white-space: normal; word-break: break-all; }
+
+/* ── Generic object card ─────────────────────────── */
+.object-rows { display: flex; flex-direction: column; gap: 0.4rem; }
+.object-row { display: flex; gap: 1rem; font-size: 0.8rem; font-family: monospace; }
+.obj-key { color: #818cf8; flex-shrink: 0; min-width: 120px; }
+.obj-val { color: #e2e8f0; }
+
+/* ── View toggle ─────────────────────────────────── */
+.view-toggle {
+  display: flex;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 7px;
+  padding: 2px;
+  gap: 2px;
+  margin-left: 0.5rem;
+}
+.toggle-btn {
+  background: transparent;
+  border: none;
+  color: #4b5563;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  letter-spacing: 0.03em;
+}
+.toggle-btn:hover { color: #94a3b8; }
+.toggle-btn.active {
+  background: #7c3aed;
+  color: #fff;
+}
+
+/* ── Card grid view ──────────────────────────────── */
+.headers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.6rem;
+}
+.header-card {
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  transition: border-color 0.15s, transform 0.1s;
+  overflow: hidden;
+}
+.header-card:hover { border-color: #30363d; transform: translateY(-2px); }
+.header-card-key {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 20px;
+}
+.header-card-val {
+  font-size: 0.73rem;
+  font-family: "SF Mono", "Fira Code", monospace;
+  color: #8b949e;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+/* ── No results ──────────────────────────────────── */
+.empty { color: #3d444d; font-size: 0.78rem; padding: 0.25rem 0; }

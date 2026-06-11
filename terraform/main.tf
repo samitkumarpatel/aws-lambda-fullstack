@@ -13,10 +13,9 @@ locals {
     "aws-lambda-with-spring" = {
       memory_size           = 3008
       environment_variables = {}
-      enable_function_url   = false #default is false
-      api_gateway_route = {
-        path_prefix   = "api"
-        path_rewrites = {}
+      enable_function_url   = false
+      api_gateway_route_mapping = {
+        "ANY /api" = { rewrite = null }
       }
     },
     "aws-lambda-with-spring-product" = {
@@ -25,11 +24,8 @@ locals {
         API_BASE_URI = "/product"
       }
       enable_function_url = false
-      api_gateway_route = {
-        path_prefix   = "product"
-        path_rewrites = {
-          "product" = "/product"
-        }
+      api_gateway_route_mapping = {
+        "ANY /product" = { rewrite = "/product" }
       }
     },
     "aws-lambda-with-spring-planning" = {
@@ -38,11 +34,9 @@ locals {
         API_BASE_URI = "/planning"
       }
       enable_function_url = false
-      api_gateway_route = {
-        path_prefix   = "nothing"
-        path_rewrites = {
-          "nothing" = "/planning"
-        }
+      api_gateway_route_mapping = {
+        "GET /admin/subscribe"  = { rewrite = "/planning" }
+        "GET /nothing" = { rewrite = "/planning" }
       }
     }
   }
@@ -54,7 +48,7 @@ locals {
   ecr_repos  = local.ecr
   s3_buckets = toset(local.s3)
 
-  http_api_gateway_routes = { for k, v in local.functions : k => v if v.api_gateway_route != null }
+  has_api_gateway_route_mapping = anytrue([for k, v in local.functions : length(try(v.api_gateway_route_mapping, {})) > 0])
 }
 
 module "ecr" {
@@ -128,20 +122,22 @@ resource "aws_acm_certificate_validation" "this" {
 
 module "api_gateway_route" {
   source = "./modules/api-gateway"
-  count  = length(local.http_api_gateway_routes) > 0 ? 1 : 0
+  count  = local.has_api_gateway_route_mapping ? 1 : 0
   name   = "aws-lambda-api"
 
   domain_name     = local.domain.name != "" ? local.domain.name : null
   certificate_arn = local.domain.name != "" ? aws_acm_certificate_validation.this[0].certificate_arn : null
 
-  integrations = {
-    for k, v in local.http_api_gateway_routes :
-    "ANY /${v.api_gateway_route.path_prefix}/{proxy+}" => {
-      lambda_function_arn  = module.lambda[k].function_arn
-      lambda_function_name = module.lambda[k].function_name
-      path_rewrites        = v.api_gateway_route.path_rewrites
+  integrations = merge([
+    for fn_name, fn in local.functions : {
+      for route_key, route in try(fn.api_gateway_route_mapping, {}) :
+      "${route_key}/{proxy+}" => {
+        lambda_function_arn  = module.lambda[fn_name].function_arn
+        lambda_function_name = module.lambda[fn_name].function_name
+        path_rewrites        = route.rewrite != null ? { "rewrite" = route.rewrite } : {}
+      }
     }
-  }
+  ]...)
 }
 
 # Step 5: point api.your-task.dev → API Gateway custom domain in Azure DNS
