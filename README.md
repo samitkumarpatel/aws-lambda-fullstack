@@ -1,3 +1,11 @@
+# aws-lambda-fullstack
+A Generic Java project where endpoint are dynamically set - to be use for Lambda (aws function) with java stack.
+# UI
+Generic UI, which render return JSN in a nicely manner
+
+# Infrastructure
+Infrastructure to prove ecr, lambda, http api gateway, acm, route53, cloudfront and etc..
+
 # Infrastructure — Terraform
 
 Production AWS infrastructure for frontend microfrontends, API (Lambda + API Gateway), ECR, ACM, and Route 53. Organised into reusable modules and independently deployable stacks.
