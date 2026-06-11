@@ -1,4 +1,4 @@
-package com.example.aws_lambda_with_spring;
+package dev.your_task.aws_lambda_fullstack;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -11,10 +11,10 @@ import org.springframework.web.servlet.function.ServerResponse;
 import java.util.Map;
 
 @SpringBootApplication
-public class AwsLambdaWithSpringApplication {
+public class AwsLambdaFullStackApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AwsLambdaWithSpringApplication.class, args);
+		SpringApplication.run(AwsLambdaFullStackApplication.class, args);
 	}
 
 	@Bean

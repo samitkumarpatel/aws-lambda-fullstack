@@ -1,6 +1,6 @@
 spring:
   application:
-    name: aws-lambda-with-spring
+    name: aws-lambda-fullstack
     api:
       base-uri: ${API_BASE_URI:/api}
   main:

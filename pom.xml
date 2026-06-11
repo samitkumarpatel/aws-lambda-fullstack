@@ -8,8 +8,8 @@
 		<version>4.0.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>aws-lambda-with-spring</artifactId>
+	<groupId>dev.your_task</groupId>
+	<artifactId>aws-lambda-fullstack</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<name/>
 	<description/>

@@ -1,4 +1,4 @@
-package com.example.aws_lambda_with_spring;
+package dev.your_task.aws_lambda_fullstack;
 
 import com.amazonaws.serverless.proxy.model.AwsProxyResponse;
 import com.amazonaws.serverless.proxy.model.HttpApiV2ProxyRequest;
@@ -14,7 +14,7 @@ public class FunctionUrlHandler implements RequestStreamHandler {
     private static final SpringBootLambdaContainerHandler<HttpApiV2ProxyRequest, AwsProxyResponse> handler;
     static {
         try {
-            handler = SpringBootLambdaContainerHandler.getHttpApiV2ProxyHandler(AwsLambdaWithSpringApplication.class);
+            handler = SpringBootLambdaContainerHandler.getHttpApiV2ProxyHandler(AwsLambdaFullStackApplication.class);
         } catch (Exception e) {
             throw new RuntimeException("Could not initialize Spring Boot application", e);
         }
