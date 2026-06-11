@@ -20,5 +20,5 @@ output "api_gateway_endpoint" {
 
 output "route53_name_servers" {
   description = "NS values to add as a delegation record in Azure DNS (api.your-task.dev → Route53). Only populated when using main-with-route53.tf.example."
-  value       = try(aws_route53_zone.api[0].name_servers, null)
+  value       = null
 }

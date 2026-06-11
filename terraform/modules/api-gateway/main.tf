@@ -1,8 +1,8 @@
 locals {
   # One permission per unique Lambda function (multiple routes may share one Lambda)
-  unique_lambdas = {
-    for k, v in var.integrations : v.lambda_function_name => v
-  }
+  unique_lambda_names = toset([
+    for k, v in var.integrations : v.lambda_function_name
+  ])
 }
 
 resource "aws_apigatewayv2_api" "this" {
@@ -86,7 +86,7 @@ resource "aws_apigatewayv2_api_mapping" "this" {
 }
 
 resource "aws_lambda_permission" "this" {
-  for_each = local.unique_lambdas
+  for_each = local.unique_lambda_names
 
   statement_id  = "AllowAPIGatewayInvoke-${each.key}"
   action        = "lambda:InvokeFunction"

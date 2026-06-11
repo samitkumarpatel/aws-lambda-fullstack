@@ -2,7 +2,7 @@ locals {
 
   ecr = {
     "aws-lambda-with-spring" = {
-      source_image     = "ghcr.io/samitkumarpatel/aws-lambda-with-spring:latest"
+      source_image     = "ghcr.io/samitkumarpatel/aws-lambda-fullstack:latest"
       source_image_tag = "latest"
     }
   }
