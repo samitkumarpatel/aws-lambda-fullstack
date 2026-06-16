@@ -48,3 +48,76 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  build-generic-ui:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    defaults:
+      run:
+        working-directory: generic-ui
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: generic-ui/package-lock.json
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Set package scope and version
+        run: |
+          npm pkg set name="@${{ github.repository_owner }}/generic-ui"
+          npm version 0.0.0-${{ github.run_id }} --no-git-tag-version
+
+      - name: Publish to GitHub Packages
+        run: npm publish --tag latest
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-json-placeholder-ui:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    defaults:
+      run:
+        working-directory: json-placeholder-ui
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: json-placeholder-ui/package-lock.json
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_BASE_URL: ${{ vars.JP_UI_API_BASE_URL }}
+
+      - name: Set package scope and version
+        run: |
+          npm pkg set name="@${{ github.repository_owner }}/json-placeholder-ui"
+          npm version 0.0.0-${{ github.run_id }} --no-git-tag-version
+
+      - name: Publish to GitHub Packages
+        run: npm publish --tag latest
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

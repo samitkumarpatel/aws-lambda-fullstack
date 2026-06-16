@@ -1,0 +1,308 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f5f7fa;
+  color: #1a202c;
+  min-height: 100vh;
+}
+
+/* ── Layout ─────────────────────────────────────── */
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+/* ── Header ─────────────────────────────────────── */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+.app-header h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a202c;
+  letter-spacing: 0.02em;
+}
+.user-count {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Search ──────────────────────────────────────── */
+.search-input {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.55rem 1rem;
+  color: #1a202c;
+  font-size: 0.875rem;
+  outline: none;
+  width: 280px;
+  transition: border-color 0.15s, box-shadow 0.15s, width 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.search-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  width: 320px;
+}
+.search-input::placeholder { color: #c4c9d4; }
+.search-input:disabled { background: #f9fafb; color: #9ca3af; cursor: not-allowed; }
+
+/* ── Grid ────────────────────────────────────────── */
+.user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  grid-auto-rows: 240px;
+}
+
+/* ── Flip card scene ─────────────────────────────── */
+.card-scene {
+  perspective: 1000px;
+  cursor: pointer;
+  min-height: 220px;
+}
+.card-flipper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+.card-scene.is-flipped .card-flipper {
+  transform: rotateY(180deg);
+}
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: #fff;
+  border: 1px solid #e8edf3;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  display: flex;
+  flex-direction: column;
+}
+.card-scene:hover .card-face {
+  border-color: #6366f1;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12);
+}
+.card-back {
+  transform: rotateY(180deg);
+  padding: 1.1rem 1.25rem 1rem;
+  justify-content: flex-start;
+  gap: 0;
+}
+
+/* ── Back face content ───────────────────────────── */
+.back-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.back-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #6366f1;
+}
+.back-section-title svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+.back-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.back-row {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+.back-label {
+  flex-shrink: 0;
+  width: 46px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+.back-value {
+  color: #374151;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.back-divider {
+  height: 1px;
+  background: #f0f2f5;
+  margin: 0.75rem 0;
+}
+
+/* ── Flip hint ───────────────────────────────────── */
+.flip-hint {
+  margin-top: auto;
+  padding-top: 0.6rem;
+  font-size: 0.68rem;
+  color: #d1d5db;
+  text-align: right;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+.card-front .flip-hint { padding: 0 1.25rem 0.9rem; }
+
+/* ── Card header ─────────────────────────────────── */
+.user-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.25rem 1.25rem 0;
+}
+.avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.user-id {
+  font-size: 0.68rem;
+  font-family: "SF Mono", "Fira Code", monospace;
+  color: #d1d5db;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* ── Card body ───────────────────────────────────── */
+.user-card-body {
+  padding: 1rem 1.25rem 1.25rem;
+}
+.user-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 0.85rem;
+  line-height: 1.35;
+}
+
+/* ── Detail rows ─────────────────────────────────── */
+.user-details {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+}
+.detail-icon {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+}
+.detail-icon svg {
+  width: 14px;
+  height: 14px;
+}
+.detail-text {
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-family: "SF Mono", "Fira Code", monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.detail-link {
+  font-size: 0.8rem;
+  color: #6366f1;
+  font-family: "SF Mono", "Fira Code", monospace;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.1s;
+}
+.detail-link:hover { color: #4f46e5; text-decoration: underline; }
+
+/* ── Loading ─────────────────────────────────────── */
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #9ca3af;
+  font-size: 0.85rem;
+  padding: 3rem 0;
+  justify-content: center;
+}
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid #e2e8f0;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Error box ───────────────────────────────────── */
+.error-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  font-size: 0.82rem;
+  font-family: monospace;
+}
+.error-box strong { color: #dc2626; }
+.error-box span   { color: #ef4444; opacity: 0.85; }
+.error-box code   { color: #9ca3af; font-size: 0.75rem; }
+
+/* ── Empty state ─────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.9rem;
+  padding: 4rem 0;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 560px) {
+  .app-header { flex-direction: column; align-items: stretch; }
+  .search-input { width: 100%; }
+  .search-input:focus { width: 100%; }
+}

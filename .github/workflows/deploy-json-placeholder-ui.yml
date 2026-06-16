@@ -1,0 +1,39 @@
+name: Deploy json-placeholder-ui
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Build run ID to deploy (leave blank for latest)'
+        required: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Install package
+        run: |
+          VERSION=${{ inputs.run_id != '' && format('0.0.0-{0}', inputs.run_id) || 'latest' }}
+          npm install @${{ github.repository_owner }}/json-placeholder-ui@$VERSION
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy to S3
+        run: |
+          aws s3 sync \
+            node_modules/@${{ github.repository_owner }}/json-placeholder-ui/dist/ \
+            s3://${{ vars.JP_UI_S3_BUCKET }} \
+            --delete
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
